@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, viewport-fit=cover, user-scalable=yes">
+    
+    <!-- Otimizações de Performance -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#9B111E" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+
+    <!-- Preconnect para APIs externas -->
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://api.open-meteo.com">
+
+    <title>Ruby IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Ruby IA</h3>
+            <button id="closeSidebar" aria-label="Fechar menu"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="menu-items">
+            <button class="menu-item" id="restartConversationBtn" style="background: none; border: none; width: 100%; text-align: left; padding: 10px 15px; color: inherit; font: inherit; cursor: pointer;">Reiniciar Conversa</button>
+            <div class="menu-item" id="settingsBtn">Configurações</div>
+            <div class="collapsible menu-item" id="ledControlToggle">
+                <span class="menu-text">Controle do LED <span class="maintenance-msg">(Em manutenção)</span></span>
+                <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+                <div class="collapsible-content">
+                    <div class="menu-item" id="connectArduinoBtn">Conectar ao Arduino</div>
+                    <div class="menu-item" id="ligarLedBtn">Ligar LED</div>
+                    <div class="menu-item" id="desligarLedBtn">Desligar LED</div>
+                    <div class="menu-item" id="piscarLedBtn">Piscar LED</div>
+                </div>
+            </div>
+            <div class="menu-item" id="shareBtn">Compartilhar</div>
+        </div>
+        <div class="saved-conversations" id="savedConversations">
+            <h4>Conversas Salvas</h4>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <button id="menuBtn" class="menu-toggle" title="Abrir menu"><i class="fas fa-bars"></i></button>
+        <div class="logo-container">
+            <h1 class="logo">Ruby IA</h1>
+            <img src="./index.index.png" alt="Logo Ruby IA" class="logo-img">
+        </div>
+        <button id="toggleModeBtn" class="theme-toggle" title="Modo Escuro"><i class="fas fa-moon"></i></button>
+        <div class="weather-widget">
+            <div class="weather-info">
+                <span id="weatherTemp">--°C</span>
+                <div class="weather-details">
+                    <span id="weatherCity">Carregando...</span>
+                    <span id="weatherDesc"></span>
+                </div>
+            </div>
+            <span id="weatherIcon"><i class="fas fa-cloud-sun"></i></span>
+        </div>
+    </header>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <div class="suggestions-container" id="suggestionsContainer">
+            <div class="suggestion" data-prompt="Novidades em IA">Novidades em IA</div>
+            <div class="suggestion" data-prompt="Ideias de projetos">Ideias de projetos</div>
+            <div class="suggestion" data-prompt="Aprendizado de máquina">Aprendizado de máquina</div>
+            <div class="suggestion" data-prompt="Descrever imagem">Descrever imagem</div>
+        </div>
+        <div id="imagePreviewContainer">
+            <img id="imagePreview" alt="Pré-visualização da imagem">
+            <button id="removeImageBtn" aria-label="Remover imagem"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="input-container">
+            <input type="text" id="userMessage" placeholder="Digite sua mensagem...">
+            <input type="file" id="imageUpload" accept="image/*" multiple style="display:none;">
+            <button id="uploadBtn" class="upload-btn" title="Enviar imagem"><i class="fas fa-image"></i></button>
+            <button id="micBtn" class="mic-btn" title="Gravar voz"><i class="fas fa-microphone"></i></button>
+            <button id="sendBtn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+            <button id="speakBtn" class="speak-btn" title="Ouvir resposta"><i class="fas fa-volume-up"></i></button>
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button id="closeSettings" aria-label="Fechar configurações"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-option">
+                    <label>Tema</label>
+                    <select id="themeSelect">
+                        <option value="light">Claro</option>
+                        <option value="dark">Escuro</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="ocean">Oceano</option>
+                        <option value="forest">Floresta</option>
+                    </select>
+                </div>
+                <div class="setting-option">
+                    <label>Tamanho da Fonte</label>
+                    <select id="fontSizeSelect">
+                        <option value="small">Pequeno</option>
+                        <option value="medium">Médio</option>
+                        <option value="large">Grande</option>
+                    </select>
+                </div>
+                <div class="setting-option">
+                    <label>Voz de Leitura</label>
+                    <select id="voiceSelect"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Confirmar Ação</h3>
+                <button id="closeConfirm" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Você tem certeza?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmCancelBtn" class="btn-cancel">Cancelar</button>
+                <button id="confirmOkBtn" class="btn-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
