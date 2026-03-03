@@ -124,34 +124,6 @@ Upload com preview de imagem
 
 Sistema de tema dinâmico
 
-🚀 Como Executar
-
-Clone o repositório:
-
-git clone https://github.com/seu-usuario/rubyai.git
-
-Abra o arquivo:
-
-index.html
-
-Configure sua chave de API no main.js.
-
-🛠 Tecnologias Utilizadas
-
-HTML5
-
-CSS3
-
-JavaScript (ES6+)
-
-Axios
-
-APIs REST
-
-Web Speech API
-
-Open-Meteo API
-
 📌 Objetivo do Projeto
 
 RubyAI foi desenvolvido como:
