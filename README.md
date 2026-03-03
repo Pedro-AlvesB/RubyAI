@@ -34,11 +34,13 @@ O projeto foi desenvolvido com foco em experiência do usuário, organização m
 🔌 Estrutura preparada para integração com Arduino (controle de LED)
 
 🧠 Arquitetura do Projeto
+
 📂 rubyai
  ├── index.html      # Estrutura da aplicação
  ├── styles.css      # Estilização e temas
  ├── main.js         # Lógica da aplicação e integrações
  └── README.md
+ 
 🔹 index.html
 
 Estrutura principal da interface
